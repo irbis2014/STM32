@@ -6,7 +6,7 @@ void setup() {
 void loop() {
   // put your main code here
   digitalWrite(PC13, HIGH);
-  delay(1000);
+  delay(1500);
   digitalWrite(PC13, LOW);
-  delay(1000);
+  delay(1500);
 }
