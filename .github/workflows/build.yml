@@ -2,7 +2,7 @@ name: Compile STM32
 
 on:
   push:
-    branches: [ main ]
+    branches: [ '*' ]
   workflow_dispatch:
 
 jobs:
@@ -16,16 +16,26 @@ jobs:
 
       - name: Build firmware
         env:
-          ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS: https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
+          ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS: https://github.com
         run: |
-          mkdir -p Blink
-          cp Blink.ino Blink/Blink.ino
+          mkdir -p Firmware
+          cp *.ino Firmware/Firmware.ino
           arduino-cli core update-index
           arduino-cli core install STMicroelectronics:stm32
-          arduino-cli compile --fqbn STMicroelectronics:stm32:GenF1:pnum=BLUEPILL_F103C8 --output-dir ./build Blink
+
+          if [ -f libs.txt ]; then
+            while IFS= read -r lib || [ -n "$lib" ]; do
+              lib=$(echo "$lib" | tr -d '\r' | xargs)
+              if [ -n "$lib" ]; then
+                arduino-cli lib install "$lib"
+              fi
+            done < libs.txt
+          fi
+
+          arduino-cli compile --fqbn STMicroelectronics:stm32:GenF1:pnum=BLUEPILL_F103C8 --output-dir ./build Firmware
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
-          name: stm32-firmware
+          name: firmware-${{ github.ref_name }}
           path: build/*
