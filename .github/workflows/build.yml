@@ -2,37 +2,30 @@ name: Compile STM32
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Prepare sketch folder
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Build firmware
         run: |
           mkdir -p Blink
           cp Blink.ino Blink/Blink.ino
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://github.com
+          arduino-cli core update-index
+          arduino-cli core install STMicroelectronics:stm32
+          arduino-cli compile --fqbn STMicroelectronics:stm32:GenF1:pnum=BLUEPILL_F103C8 --output-dir ./build Blink
 
-      - name: Install Arduino CLI and STM32 core
-        run: |
-          curl -fsSL https://githubusercontent.com | sh
-          ./bin/arduino-cli config init
-          ./bin/arduino-cli config add board_manager.additional_urls https://github.com
-          ./bin/arduino-cli core update-index
-          ./bin/arduino-cli core install STMicroelectronics:stm32
-
-      - name: Compile sketch
-        run: |
-          ./bin/arduino-cli compile --fqbn STMicroelectronics:stm32:GenF1:pnum=BLUEPILL_F103C8 --output-dir ./build Blink
-
-      - name: Upload firmware (.bin / .hex)
+      - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: stm32-firmware
-          path: |
-            ./build/*.bin
-            ./build/*.hex
+          path: build/*
