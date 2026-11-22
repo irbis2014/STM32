@@ -19,8 +19,8 @@ jobs:
           mkdir -p Firmware
           cp *.ino Firmware/Firmware.ino
 
-          U1="https://github.com"
-          U2="/BoardManagerFiles/raw/main"
+          U1="https://githubusercontent.com"
+          U2="/stm32duino/BoardManagerFiles/main"
           U3="/package_stmicroelectronics_index.json"
           URL="${U1}${U2}${U3}"
 
