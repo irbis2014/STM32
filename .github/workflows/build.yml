@@ -15,14 +15,13 @@ jobs:
         uses: arduino/setup-arduino-cli@v2
 
       - name: Build firmware
+        env:
+          ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS: https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
         run: |
           mkdir -p Blink
           cp Blink.ino Blink/Blink.ino
-          URL="https://github.com"
-          URL="$URL/BoardManagerFiles/raw/main"
-          URL="$URL/package_stmicroelectronics_index.json"
-          arduino-cli core update-index --additional-urls "$URL"
-          arduino-cli core install STMicroelectronics:stm32 --additional-urls "$URL"
+          arduino-cli core update-index
+          arduino-cli core install STMicroelectronics:stm32
           arduino-cli compile --fqbn STMicroelectronics:stm32:GenF1:pnum=BLUEPILL_F103C8 --output-dir ./build Blink
 
       - name: Upload firmware
