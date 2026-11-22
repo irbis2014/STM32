@@ -15,13 +15,17 @@ jobs:
         uses: arduino/setup-arduino-cli@v2
 
       - name: Build firmware
-        env:
-          ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS: https://github.com
         run: |
           mkdir -p Firmware
           cp *.ino Firmware/Firmware.ino
-          arduino-cli core update-index
-          arduino-cli core install STMicroelectronics:stm32
+
+          U1="https://github.com"
+          U2="/BoardManagerFiles/raw/main"
+          U3="/package_stmicroelectronics_index.json"
+          URL="${U1}${U2}${U3}"
+
+          arduino-cli core update-index --additional-urls "$URL"
+          arduino-cli core install STMicroelectronics:stm32 --additional-urls "$URL"
 
           if [ -f libs.txt ]; then
             while IFS= read -r lib || [ -n "$lib" ]; do
