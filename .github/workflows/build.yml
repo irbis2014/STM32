@@ -18,10 +18,11 @@ jobs:
         run: |
           mkdir -p Blink
           cp Blink.ino Blink/Blink.ino
-          arduino-cli config init
-          arduino-cli config add board_manager.additional_urls https://github.com
-          arduino-cli core update-index
-          arduino-cli core install STMicroelectronics:stm32
+          URL="https://github.com"
+          URL="$URL/BoardManagerFiles/raw/main"
+          URL="$URL/package_stmicroelectronics_index.json"
+          arduino-cli core update-index --additional-urls "$URL"
+          arduino-cli core install STMicroelectronics:stm32 --additional-urls "$URL"
           arduino-cli compile --fqbn STMicroelectronics:stm32:GenF1:pnum=BLUEPILL_F103C8 --output-dir ./build Blink
 
       - name: Upload firmware
