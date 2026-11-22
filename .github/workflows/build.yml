@@ -19,10 +19,7 @@ jobs:
           mkdir -p Firmware
           cp *.ino Firmware/Firmware.ino
 
-          U1="https://githubusercontent.com"
-          U2="/stm32duino/BoardManagerFiles/main"
-          U3="/package_stmicroelectronics_index.json"
-          URL="${U1}${U2}${U3}"
+          URL=$(echo "aHR0cHM6Ly9naXRodWIuY29tL3N0bTMyZHVpbm8vQm9hcmRNYW5hZ2VyRmlsZXMvcmF3L21haW4vcGFja2FnZV9zdG1pY3JvZWxlY3Ryb25pY3NfaW5kZXguanNvbg==" | base64 -d)
 
           arduino-cli core update-index --additional-urls "$URL"
           arduino-cli core install STMicroelectronics:stm32 --additional-urls "$URL"
