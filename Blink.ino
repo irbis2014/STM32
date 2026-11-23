@@ -2,15 +2,15 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h> // Для BMP280 замените на <Adafruit_BMP280.h>
+#include <Adafruit_BMP280.h> // Для BMP280 замените на <Adafruit_BMP280.h>
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_ADDR 0x3C
-#define BME_ADDR  0x76 // У китайских модулей обычно 0x76, реже 0x77
+#define BMP_ADDR  0x76 // У китайских модулей обычно 0x76, реже 0x77
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-Adafruit_BME280 bme; // Для BMP280: Adafruit_BMP280 bmp;
+Adafruit_BMP280 bme; // Для BMP280: Adafruit_BMP280 bmp;
 
 void setup() {
   Wire.setSDA(PB7);
