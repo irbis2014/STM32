@@ -1,15 +1,31 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1
+#define OLED_ADDR 0x3C // Часто встречается 0x3C или 0x3D
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
 void setup() {
-  // put your setup code here
-  pinMode(PC13, OUTPUT);
-  pinMode(PB1,OUTPUT);
+  Wire.setSDA(PB7);
+  Wire.setSCL(PB6);
+  Wire.begin();
+
+  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
+    while (true);
+  }
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println("STM32 Blue Pill");
+  display.println("OLED 0.96 I2C OK");
+  display.display();
 }
 
 void loop() {
-  // put your main code here
-  digitalWrite(PC13, HIGH);
-  digitalWrite(PB1, HIGH);
-  delay(1000);
-  digitalWrite(PC13, LOW);
-  digitalWrite(PB1, LOW);
-  delay(1000);
 }
