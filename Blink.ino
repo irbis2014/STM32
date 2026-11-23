@@ -2,15 +2,16 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BMP280.h> // Для BMP280 замените на <Adafruit_BMP280.h>
+#include <Adafruit_BMP280.h>
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-#define OLED_ADDR 0x3C
-#define BMP_ADDR  0x76 // У китайских модулей обычно 0x76, реже 0x77
+#define OLED_RESET -1
+#define OLED_ADDR 0x3C  // Если экран не загорится, замените на 0x3D
+#define BMP_ADDR  0x76  // Стандартный адрес китайских плат BMP280 (иногда 0x77)
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-Adafruit_BMP280 bme; // Для BMP280: Adafruit_BMP280 bmp;
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Adafruit_BMP280 bmp(&Wire);
 
 void setup() {
   Wire.setSDA(PB7);
@@ -25,38 +26,42 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
 
-  if (!bme.begin(BME_ADDR, &Wire)) {
+  if (!bmp.begin(BMP_ADDR)) {
     display.setCursor(0, 0);
-    display.println("BME280 error!");
+    display.println("BMP280 not found!");
+    display.println("Check 0x76 / 0x77");
     display.display();
     while (true);
   }
+
+  // Настройка фильтрации и точности измерений (рекомендуемая для метеостанции)
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,
+                  Adafruit_BMP280::SAMPLING_X2,     // Температура
+                  Adafruit_BMP280::SAMPLING_X16,    // Давление
+                  Adafruit_BMP280::FILTER_X16,      // Фильтр помех
+                  Adafruit_BMP280::STANDBY_MS_500); // Пауза между замерами
 }
 
 void loop() {
-  float temp = bme.readTemperature();
-  float pres = bme.readPressure() / 133.322F; // Перевод из Па в мм рт. ст.
-  float hum  = bme.readHumidity();            // Для BMP280 эту строку убрать
+  float temp = bmp.readTemperature();
+  float presPa = bmp.readPressure();
+  float presMmHg = presPa / 133.322F; // Перевод из Паскалей в мм рт. ст.
 
   display.clearDisplay();
-  display.setCursor(0, 0);
-  display.setTextSize(1);
-  display.println("Meteostation:");
   
-  display.setCursor(0, 16);
-  display.print("Temp: ");
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.println("STM32 + BMP280");
+  display.drawLine(0, 10, 128, 10, SSD1306_WHITE);
+
+  display.setTextSize(2);
+  display.setCursor(0, 18);
   display.print(temp, 1);
   display.println(" C");
 
-  display.setCursor(0, 32);
-  display.print("Pres: ");
-  display.print(pres, 1);
-  display.println(" mmHg");
-
-  display.setCursor(0, 48);
-  display.print("Hum:  ");
-  display.print(hum, 1);
-  display.println(" %");
+  display.setCursor(0, 42);
+  display.print(presMmHg, 1);
+  display.println(" mm");
 
   display.display();
   delay(2000);
