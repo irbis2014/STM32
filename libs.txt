@@ -1,6 +1,5 @@
+Adafruit BusIO
 Adafruit GFX Library
 Adafruit SSD1306
-DHT sensor library
-LiquidCrystal I2C
 Adafruit Unified Sensor
 Adafruit BMP280 Library
